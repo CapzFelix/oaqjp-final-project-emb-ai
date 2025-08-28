@@ -18,19 +18,31 @@ def emotion_detector(text_to_analyze):
     formatted_response = json.loads(response.text)
 
     # Parse the specific emotion score into a dictionary
-    emotion_results = {
-        'anger': formatted_response['emotionPredictions'][0]['emotion']['anger'],
-        'disgust': formatted_response['emotionPredictions'][0]['emotion']['disgust'],
-        'fear': formatted_response['emotionPredictions'][0]['emotion']['fear'],
-        'joy': formatted_response['emotionPredictions'][0]['emotion']['joy'],
-        'sadness': formatted_response['emotionPredictions'][0]['emotion']['sadness']
+    if response.status_code == 200:
+        emotion_results = {
+            'anger': formatted_response['emotionPredictions'][0]['emotion']['anger'],
+            'disgust': formatted_response['emotionPredictions'][0]['emotion']['disgust'],
+            'fear': formatted_response['emotionPredictions'][0]['emotion']['fear'],
+            'joy': formatted_response['emotionPredictions'][0]['emotion']['joy'],
+            'sadness': formatted_response['emotionPredictions'][0]['emotion']['sadness']
+            }
+        
+        # Find the emotion with the highest score
+        max_key = max(emotion_results, key=emotion_results.get)
+
+        # Append the dominant emotion into the dictionary
+        emotion_results['dominant_emotion'] = max_key
+
+    elif response.status_code == 400:
+        emotion_results = {
+            'anger': None,
+            'disgust': None,
+            'fear': None,
+            'joy': None,
+            'sadness': None,
+            'dominant_emotion': None
         }
-
-    # Find the emotion with the highest score
-    max_key = max(emotion_results, key=emotion_results.get)
-
-    # Append the dominant emotion into the dictionary
-    emotion_results['dominant_emotion'] = max_key
 
     # Return the dictionary result
     return emotion_results
+    
